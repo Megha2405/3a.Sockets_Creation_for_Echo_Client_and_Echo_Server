@@ -13,51 +13,57 @@ server:
 ```
 import socket
 
-    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    server_socket.bind(("localhost", 12345))  # Bind to localhost and port 12345
-    server_socket.listen(1)  # Listen for one connection
-    print("Server is listening on port 12345...")
+HOST = '127.0.0.1'  
+PORT = 65432        
 
-    conn, addr = server_socket.accept()
-    print(f"Connection established with {addr}")
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
 
+    print(f"Server is listening on {HOST}:{PORT}")
     while True:
-        data = conn.recv(1024).decode()
-        if not data or data.lower() == "exit":
-            print("Client disconnected.")
-            break
-        print(f"Client: {data}")
-        
-        response = input("Server: ")
-        conn.send(response.encode())
+        conn, addr = server_socket.accept()
+        with conn:
+            print(f"Connected by {addr}")
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)
+                print(f"Echoed: {data.decode('utf-8')}")
 
-    conn.close()
-    server_socket.close()
+
+
 ```
 client
 ```
 import socket
 
+HOST = '127.0.0.1'  
+PORT = 65432        
 
-    client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    client_socket.connect(("localhost", 12345))  # Connect to the server
-    print("Connected to the server. Type 'exit' to quit.")
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+    server_socket.bind((HOST, PORT))
+    server_socket.listen()
 
+    print(f"Server is listening on {HOST}:{PORT}")
     while True:
-        message = input("Client: ")
-        client_socket.send(message.encode())
+        conn, addr = server_socket.accept()
+        with conn:
+            print(f"Connected by {addr}")
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
+                conn.sendall(data)
+                print(f"Echoed: {data.decode('utf-8')}")
 
-        if message.lower() == "exit":
-            break
-
-        response = client_socket.recv(1024).decode()
-        print(f"Server: {response}")
-
-    client_socket.close()
 
 ```
+
 ## OUPUT
-![output](<Screenshot 2025-09-21 222051.png>)
+![output](<Screenshot 2025-09-21 224407.png>)
+
 ## RESULT
 Thus, the python program for creating Echo Client and Echo Server using TCP Sockets Links 
 was successfully created and executed.
